@@ -1,0 +1,3 @@
+Beluga
+------
+A Python IRC Bot Framework
