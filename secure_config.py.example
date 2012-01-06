@@ -1,0 +1,5 @@
+NS_NICK = "MyBelugaBot"
+NS_USER = ""
+NS_PASSWORD = ""
+NS_ADMINS = ["admin host name goes here"]
+CHANNEL = "#channeltojoin"

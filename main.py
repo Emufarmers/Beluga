@@ -4,7 +4,7 @@ from twisted.internet import reactor, protocol
 from twisted.python import log
 
 # system imports
-import time, sys, json, subprocess, thread, re, BasicPlugin
+import time, sys, json, subprocess, thread, re, BasicPlugin, os
 from secure_config import *
 
 class BelugaBot(irc.IRCClient):
@@ -42,40 +42,72 @@ class BelugaBot(irc.IRCClient):
           if msg.startswith(self.nickname + ": !load"):
               user = user.split('!', 1)[0]
               plugin = msg.split(':', 2)[2]
-              if plugin in self.modules:
+              if plugin == "BasicPlugin": return
+              if not os.path.isfile(plugin + ".py"): return
+              if plugin in self.plugins:
                 msg = "can't load %s twice" % plugin
                 self.me(channel, msg)
               else:
-                self.modules[plugin] = __import__(plugin)
+                if not plugin in self.modules:
+                  self.modules[plugin] = __import__(plugin)
+                else:
+                  reload(self.modules[plugin])
                 exec("self.plugins[plugin] = self.modules[plugin].%s(self)" % plugin)
                 msg = "has loaded %s" % plugin
                 self.me(channel, msg)
               return
           elif msg.startswith(self.nickname + ": !unload"):
               user = user.split('!', 1)[0]
-              module = msg.split(':', 2)[2]
-              if module in self.modules:
-                temp = self.modules[module]
-                del self.modules[module]
-                temp.kill()
-                msg = "has unloaded %s" % module
+              plugin = msg.split(':', 2)[2]
+              if plugin == "BasicPlugin": return
+              if not os.path.isfile(plugin + ".py"): return
+              if plugin in self.plugins:
+                temp = self.modules[plugin]
+                del self.plugins[plugin]
+                msg = "has unloaded %s" % plugin
                 self.me(channel, msg)
               else:
-                msg = "isn't running %s" % module
+                msg = "isn't running %s" % plugin
+                self.me(channel, msg)
+              return
+          elif msg.startswith(self.nickname + ": !reload"):
+              user = user.split('!', 1)[0]
+              plugin = msg.split(':', 2)[2]
+              if plugin == "BasicPlugin": return
+              if not os.path.isfile(plugin + ".py"): return
+              if plugin in self.plugins:
+                temp = self.modules[plugin]
+                del self.plugins[plugin]
+                reload(self.modules[plugin])
+                exec("self.plugins[plugin] = self.modules[plugin].%s(self)" % plugin)
+                msg = "has reloaded %s" % plugin
+                self.me(channel, msg)
+              else:
+                msg = "isn't running %s" % plugin
                 self.me(channel, msg)
               return
               
-          for k, v in self.plugins:
-            v.privmsg(user, channel, msg)
+          for k, v in self.plugins.iteritems():
+              if v.privmsg(user, channel, msg): return
 
     def action(self, user, channel, msg):
         """This will get called when the bot sees someone do an action."""
-
+        for k, v in self.plugins.iteritems():
+            if v.action(user, channel, msg):
+                return 
+                
+    def userJoined(self, user, channel):
+        """This will get called when the bot sees someone join a channel."""
+        for k, v in self.plugins.iteritems():
+            if v.userJoined(user, channel):
+                return
     # irc callbacks
 
     def irc_NICK(self, prefix, params):
         """Called when an IRC user changes their nickname."""
-
+        for k, v in self.plugins.iteritems():
+            if v.irc_NICK(prefix, params):
+                return
 
     # For fun, override the method that determines how a nickname is changed on
     # collisions. The default method appends an underscore.
@@ -113,7 +145,7 @@ class BelugaBotFactory(protocol.ClientFactory):
 
 if __name__ == '__main__':
     # create factory protocol and application
-    f = BelugaBotFactory("##earwig")
+    f = BelugaBotFactory(CHANNEL)
 
     # connect factory to this host and port
     reactor.connectTCP("irc.freenode.net", 6667, f)
