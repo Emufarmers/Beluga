@@ -13,29 +13,7 @@ class BelugaBot(irc.IRCClient):
     password = "rawr"
     admin_list = ["wikipedia/The-Earwig", "wikipedia/RandomStringOfCharacters"]
     modules = dict()
-    
-    def parse_response(self, output):
-        if output == "\n":
-            return
-        print output
-        output = json.loads(output)
-      
-        if output['do'] == "me":
-            self.me(output['channel'].encode('ascii','ignore'), output['msg'].encode('ascii','ignore'))
-        elif output['do'] == "msg":
-            self.msg(output['channel'].encode('ascii','ignore'), output['msg'].encode('ascii','ignore'))
-        
-    def send_data(self, data):
-        data = json.dumps(data)
-        
-        for k, v in self.modules.iteritems():
-            v.stdin.write('%s\n' % data)
-            output = v.stdout.readline()
-            self.parse_response(output)
-            
-    def tick(self):
-        self.send_data({'method' : 'tick', 'channel' : self.factory.channel})
-            
+           
     def connectionMade(self):
         irc.IRCClient.connectionMade(self)
 
@@ -67,7 +45,8 @@ class BelugaBot(irc.IRCClient):
                 msg = "can't load %s twice" % module
                 self.me(channel, msg)
               else:
-                self.modules[module] = subprocess.Popen('python %s.py' % module, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+                mod = __import__(module)
+                self.modules[module] = 
                 msg = "has loaded %s" % module
                 self.me(channel, msg)
               return
@@ -84,21 +63,14 @@ class BelugaBot(irc.IRCClient):
                 msg = "isn't running %s" % module
                 self.me(channel, msg)
               return
-            
-        data = {'method' : 'privmsg', 'nick' : self.nickname, 'user' : user, 'channel' : channel, 'msg' : msg}
-        self.send_data(data)
 
     def action(self, user, channel, msg):
         """This will get called when the bot sees someone do an action."""
-        data = {'method' : 'action', 'nick' : self.nickname, 'user' : user, 'channel' : channel, 'msg' : msg}
-        self.send_data(data)
 
     # irc callbacks
 
     def irc_NICK(self, prefix, params):
         """Called when an IRC user changes their nickname."""
-        data = {'method' : 'irc_nick', 'nick' : self.nickname, 'prefix' : prefix, 'params' : params}
-        self.send_data(data)
 
 
     # For fun, override the method that determines how a nickname is changed on
@@ -112,11 +84,6 @@ class BelugaBot(irc.IRCClient):
 
 p = BelugaBot()
 
-def tick():
-  while True:
-    time.sleep(3)
-    p.tick()
-
 class BelugaBotFactory(protocol.ClientFactory):
     """A factory for LogBots.
 
@@ -129,7 +96,6 @@ class BelugaBotFactory(protocol.ClientFactory):
     def buildProtocol(self, addr):
         #p = BelugaBot()
         p.factory = self
-        thread.start_new_thread(tick,())
         return p
 
     def clientConnectionLost(self, connector, reason):
