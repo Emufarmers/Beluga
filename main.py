@@ -4,15 +4,17 @@ from twisted.internet import reactor, protocol
 from twisted.python import log
 
 # system imports
-import time, sys, json, subprocess, thread, re
+import time, sys, json, subprocess, thread, re, BasicPlugin
+from secure_config import *
 
 class BelugaBot(irc.IRCClient):
     
-    nickname = "BelugaBot"
-    ns_user = "TuskBot"
-    password = "rawr"
-    admin_list = ["wikipedia/The-Earwig", "wikipedia/RandomStringOfCharacters"]
+    nickname = NS_NICK
+    ns_user = NS_USER
+    password = NS_PASSWORD
+    admin_list = NS_ADMINS
     modules = dict()
+    plugins = dict()
            
     def connectionMade(self):
         irc.IRCClient.connectionMade(self)
@@ -25,7 +27,6 @@ class BelugaBot(irc.IRCClient):
 
     def signedOn(self):
         """Called when bot has succesfully signed on to server."""
-        self.msg("nickserv", "identify %s %s" % (self.ns_user, self.password))
         self.join(self.factory.channel)
 
     def joined(self, channel):
@@ -40,14 +41,14 @@ class BelugaBot(irc.IRCClient):
         if host in self.admin_list:
           if msg.startswith(self.nickname + ": !load"):
               user = user.split('!', 1)[0]
-              module = msg.split(':', 2)[2]
-              if module in self.modules:
-                msg = "can't load %s twice" % module
+              plugin = msg.split(':', 2)[2]
+              if plugin in self.modules:
+                msg = "can't load %s twice" % plugin
                 self.me(channel, msg)
               else:
-                mod = __import__(module)
-                self.modules[module] = 
-                msg = "has loaded %s" % module
+                self.modules[plugin] = __import__(plugin)
+                exec("self.plugins[plugin] = self.modules[plugin].%s(self)" % plugin)
+                msg = "has loaded %s" % plugin
                 self.me(channel, msg)
               return
           elif msg.startswith(self.nickname + ": !unload"):
@@ -63,6 +64,9 @@ class BelugaBot(irc.IRCClient):
                 msg = "isn't running %s" % module
                 self.me(channel, msg)
               return
+              
+          for k, v in self.plugins:
+            v.privmsg(user, channel, msg)
 
     def action(self, user, channel, msg):
         """This will get called when the bot sees someone do an action."""
