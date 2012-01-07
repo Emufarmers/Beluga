@@ -4,11 +4,14 @@ A (modular) Python IRC Bot Framework
 
 Setup
 -----
-1. Make secure_config.py
+* Make secure_config.py
+
 >cp secure_config.py.example secure_config.py
-1. Fill out the settings in secure_config.py
-1. Note that conf_plugins are loaded just before joining the channel
-1. Start bot with:
+
+* Fill out the settings in secure_config.py
+* Note that conf_plugins are loaded just before joining the channel
+* Start bot with:
+
 >python main.py
   
 Notes
