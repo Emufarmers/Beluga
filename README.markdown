@@ -9,6 +9,10 @@ Setup
 1. Fill out the settings in secure_config.py
 1. Start bot with:
   python main.py
+  
+Notes
+-----
+Due to how Twisted works, any plugins that start other reactor services should not be reloaded with !reload, but instead !unload and then !load.
 
 Plugins
 -------
