@@ -33,7 +33,7 @@ class FormPage(Resource):
       repo_output = "[%s] %s created branch '%s' (%i %s)" % (commit_info["repository"]["name"],commit_info["pusher"]["name"] ,str(commit_info["ref"]).split("/")[2],number_of_commits,commit_string)
       
     if "deleted" in commit_info:
-      if commit_info["deleted"] = "True":
+      if commit_info["deleted"] == "True":
         repo_output = "[%s] %s deleted branch '%s'" % (commit_info["repository"]["name"],commit_info["pusher"]["name"] ,str(commit_info["ref"]).split("/")[2])
     
     self.IRC.msg(self.IRC.factory.channel, repo_output.encode('ascii','ignore'))
