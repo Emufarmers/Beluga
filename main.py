@@ -94,12 +94,12 @@ class BelugaBot(irc.IRCClient):
                 self.me(channel, msg)
               return
           
-          if msg.startswith(self.nickname + ": !plugins"):
-            self.me(channel,"is running " + ' '.join(k for k in self.plugins.keys()))
-            return
+        if msg.startswith(self.nickname + ": !plugins"):
+          self.me(channel,"is running " + ' '.join(k for k in self.plugins.keys()))
+          return
                 
-          for k, v in self.plugins.iteritems():
-              if v.privmsg(user, channel, msg): return
+        for k, v in self.plugins.iteritems():
+          if v.privmsg(user, channel, msg): return
 
     def action(self, user, channel, msg):
         """This will get called when the bot sees someone do an action."""
