@@ -4,7 +4,7 @@ from twisted.internet import reactor, protocol
 from twisted.python import log
 
 # system imports
-import time, sys, json, subprocess, thread, re, BasicPlugin, os
+import time, sys, json, subprocess, thread, re, plugins.BasicPlugin, os
 from secure_config import *
 
 class BelugaBot(irc.IRCClient):
@@ -22,13 +22,18 @@ class BelugaBot(irc.IRCClient):
     def connectionLost(self, reason):
         irc.IRCClient.connectionLost(self, reason)
 
-
+    def mod_import(self, name):
+        mod = __import__(name)
+        components = name.split('.')
+        for comp in components[1:]:
+            mod = getattr(mod, comp)
+        return mod
     # callbacks for events
 
     def signedOn(self):
         """Called when bot has succesfully signed on to server."""
         for plugin in CONF_PLUGINS:
-            self.modules[plugin] = __import__(plugin)
+            self.modules[plugin] = self.mod_import("plugins." + plugin)
             exec("self.plugins[plugin] = self.modules[plugin].%s(self)" % plugin)
             
         self.join(self.factory.channel)
@@ -49,13 +54,13 @@ class BelugaBot(irc.IRCClient):
               user = user.split('!', 1)[0]
               plugin = msg.split(':', 2)[2]
               if plugin == "BasicPlugin": return
-              if not os.path.isfile(plugin + ".py"): return
+              if not os.path.isfile("plugins/" + plugin + ".py"): return
               if plugin in self.plugins:
                 msg = "can't load %s twice" % plugin
                 self.me(channel, msg)
               else:
                 if not plugin in self.modules:
-                  self.modules[plugin] = __import__(plugin)
+                  self.modules[plugin] = self.mod_import("plugins." + plugin)
                 else:
                   reload(self.modules[plugin])
                 exec("self.plugins[plugin] = self.modules[plugin].%s(self)" % plugin)
