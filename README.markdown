@@ -16,7 +16,7 @@ Setup
   
 Notes
 -----
-Due to how Twisted works, any plugins that start other reactor services should not be reloaded with !reload, but instead !unload and then !load.
+Any plugins that start other reactor services (for instance, GitPost) should not be reloaded with !reload, but instead !unload and then !load.
 
 Plugins
 -------
