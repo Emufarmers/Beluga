@@ -6,13 +6,13 @@ Setup
 -----
 * Make secure_config.py
 
-  cp secure_config.py.example secure_config.py
+>cp secure_config.py.example secure_config.py
 
 * Fill out the settings in secure_config.py
 * Note that conf_plugins are loaded just before joining the channel
 * Start bot with:
 
-  python main.py
+>python main.py
   
 Notes
 -----
