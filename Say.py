@@ -1,4 +1,5 @@
 import string
+from secure_config import *
 from BasicPlugin import BasicPlugin
 
 class Say(BasicPlugin):
