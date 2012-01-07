@@ -6,12 +6,12 @@ class LinkSearch(BasicPlugin):
   
   def privmsg(self, user, channel, msg):
     #This will get called when the bot receives a message.   
-    m = re.match("(https?\:\/\/.*?)(\s|$)", msg)
+    m = re.search("(https?\:\/\/.*?)(\s|$)", msg)
     if m:
       text = ""
-      try: page = urllib2.urlopen(m.group(1))
+      try: page = urllib2.urlopen(urllib2.Request(m.group(1), None, { 'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_6) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7' }))
       except URLError, e:
-        self.IRC.me(channel,'couldn\'t find ' + m.group(1))
+        self.IRC.me(channel,'couldn\'t find ' + m.group(1) + ' %i' % e.code)
         return
       if page: text = page.read(4096)
       text = string.replace(text,"\n", "")

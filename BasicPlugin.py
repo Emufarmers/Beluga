@@ -2,6 +2,9 @@ class BasicPlugin:
   def __init__(self, IRC):
     # own the IRC client!
     self.IRC = IRC
+    
+  def teardown(self):
+    return
   
   def privmsg(self, user, channel, msg):
     #This will get called when the bot receives a message.

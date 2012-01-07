@@ -63,7 +63,8 @@ class BelugaBot(irc.IRCClient):
               if not os.path.isfile(plugin + ".py"): return
               if plugin in self.plugins:
                 temp = self.modules[plugin]
-                del self.plugins[plugin]
+                self.plugins[plugin].teardown()
+                self.plugins.pop(plugin)
                 msg = "has unloaded %s" % plugin
                 self.me(channel, msg)
               else:
@@ -73,11 +74,13 @@ class BelugaBot(irc.IRCClient):
           elif msg.startswith(self.nickname + ": !reload"):
               user = user.split('!', 1)[0]
               plugin = msg.split(':', 2)[2]
-              if plugin == "BasicPlugin": return
+              if plugin == "BasicPlugin" or plugin == "GitPost": return
               if not os.path.isfile(plugin + ".py"): return
               if plugin in self.plugins:
                 temp = self.modules[plugin]
-                del self.plugins[plugin]
+                self.plugins[plugin].teardown()
+                self.plugins.pop(plugin)
+                time.sleep(1)
                 reload(self.modules[plugin])
                 exec("self.plugins[plugin] = self.modules[plugin].%s(self)" % plugin)
                 msg = "has reloaded %s" % plugin
