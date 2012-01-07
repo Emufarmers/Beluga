@@ -1,8 +1,18 @@
-import string, thread, time, cgi, json
+import string, thread, time, cgi, json, urllib2
 from twisted.web.server import Site
 from twisted.web.resource import Resource
 from twisted.internet import reactor
 from BasicPlugin import BasicPlugin
+
+def gitio_url(url_to_shorten):
+  req = urllib2.Request(url='http://git.io', data = url_to_shorten)
+  f = urllib2.urlopen(req)
+  urlinfo = str(f.info())
+  m = re.search("Location: (.+)\n?", urlinfo)
+  
+  if m:
+    return m.group(1)
+  return ""
 
 class FormPage(Resource):
   isLeaf = True
