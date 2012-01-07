@@ -71,7 +71,7 @@ class BelugaBot(irc.IRCClient):
               user = user.split('!', 1)[0]
               plugin = msg.split(':', 2)[2]
               if plugin == "BasicPlugin": return
-              if not os.path.isfile(plugin + ".py"): return
+              if not os.path.isfile("plugins/" + plugin + ".py"): return
               if plugin in self.plugins:
                 temp = self.modules[plugin]
                 self.plugins[plugin].teardown()
@@ -86,7 +86,7 @@ class BelugaBot(irc.IRCClient):
               user = user.split('!', 1)[0]
               plugin = msg.split(':', 2)[2]
               if plugin == "BasicPlugin" or plugin == "GitPost": return
-              if not os.path.isfile(plugin + ".py"): return
+              if not os.path.isfile("plugins/" + plugin + ".py"): return
               if plugin in self.plugins:
                 temp = self.modules[plugin]
                 self.plugins[plugin].teardown()
