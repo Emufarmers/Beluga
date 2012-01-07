@@ -42,10 +42,6 @@ class BelugaBot(irc.IRCClient):
         
         host = user.split('@',1)[1] if ('@' in user) else ""
         
-        if msg.startswith(self.nickname + ": !plugins"):
-          self.me(channel,"is running " + ' '.join(str(k) for k, v in self.plugins.iteritems()))
-          return
-        
         if host in self.admin_list:
           if msg.startswith(self.nickname + ": !load"):
               user = user.split('!', 1)[0]
@@ -97,7 +93,11 @@ class BelugaBot(irc.IRCClient):
                 msg = "isn't running %s" % plugin
                 self.me(channel, msg)
               return
-              
+          
+          if msg.startswith(self.nickname + ": !plugins"):
+            self.me(channel,"is running " + ' '.join(str(k) for k, v in self.plugins.iteritems()))
+            return
+                
           for k, v in self.plugins.iteritems():
               if v.privmsg(user, channel, msg): return
 
