@@ -21,7 +21,7 @@ class FormPage(Resource):
     self.IRC = IRC
     
   def render_GET(self, request):
-    return 'beep'
+    return 'Hey, you\'ve reached ' + self.IRC.nickname
   def render_POST(self, request):
     commit_info = json.loads(str(request.args["payload"][0]))
     
