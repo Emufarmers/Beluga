@@ -32,7 +32,7 @@ class FormPage(Resource):
     self.IRC.msg(self.IRC.factory.channel, repo_output.encode('ascii','ignore'))
     
     for commit in commit_info["commits"]:
-      output = "%s: %s (%s)" % (commit["author"]["name"], commit["message"], commit["url"])
+      output = "%s: %s (%s)" % (commit["author"]["name"], commit["message"], gitio_url(commit["url"]))
       self.IRC.msg(self.IRC.factory.channel, output.encode('ascii','ignore'))
     
     return 'beep'
