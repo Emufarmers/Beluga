@@ -8,7 +8,7 @@ def gitio_url(url_to_shorten):
   req = urllib2.Request(url='http://git.io', data = "url=" + url_to_shorten)
   f = urllib2.urlopen(req)
   urlinfo = str(f.info())
-  m = re.search("Location: (.+)\n?", urlinfo)
+  m = re.search("Location: (.+)\r\n?", urlinfo)
   
   if m:
     return m.group(1)
