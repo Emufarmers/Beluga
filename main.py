@@ -15,6 +15,10 @@ class BelugaBot(irc.IRCClient):
     admin_list = NS_ADMINS
     modules = dict()
     plugins = dict()
+    
+    for plugin in CONF_PLUGINS:
+        self.modules[plugin] = __import__(plugin)
+        exec("self.plugins[plugin] = self.modules[plugin].%s(self)" % plugin)
            
     def connectionMade(self):
         irc.IRCClient.connectionMade(self)
