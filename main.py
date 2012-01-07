@@ -94,9 +94,9 @@ class BelugaBot(irc.IRCClient):
                 self.me(channel, msg)
               return
           
-          #if msg.startswith(self.nickname + ": !plugins"):
+          if msg.startswith(self.nickname + ": !plugins"):
           #  self.me(channel,"is running " + ' '.join(str(k) for k, v in self.plugins.iteritems()))
-          #  return
+            return
                 
           for k, v in self.plugins.iteritems():
               if v.privmsg(user, channel, msg): return
