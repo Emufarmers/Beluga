@@ -15,10 +15,6 @@ class BelugaBot(irc.IRCClient):
     admin_list = NS_ADMINS
     modules = dict()
     plugins = dict()
-    
-    for plugin in CONF_PLUGINS:
-        self.modules[plugin] = __import__(plugin)
-        exec("self.plugins[plugin] = self.modules[plugin].%s(self)" % plugin)
            
     def connectionMade(self):
         irc.IRCClient.connectionMade(self)
@@ -31,6 +27,10 @@ class BelugaBot(irc.IRCClient):
 
     def signedOn(self):
         """Called when bot has succesfully signed on to server."""
+        for plugin in CONF_PLUGINS:
+            modules[plugin] = __import__(plugin)
+            exec("plugins[plugin] = modules[plugin].%s(self)" % plugin)
+            
         self.join(self.factory.channel)
 
     def joined(self, channel):
