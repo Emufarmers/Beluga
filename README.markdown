@@ -1,3 +1,3 @@
 Beluga
 ------
-A Python IRC Bot Framework
+A (modular) Python IRC Bot Framework
