@@ -2,6 +2,14 @@ Beluga
 ------
 A (modular) Python IRC Bot Framework
 
+Setup
+-----
+1. Make secure_config.py
+  cp secure_config.py.example secure_config.py
+1. Fill out the settings in secure_config.py
+1. Start bot with:
+  python main.py
+
 Plugins
 -------
 A plugin should subclass BasicPlugin and override the methods that it needs.
@@ -18,4 +26,3 @@ For example the simple "PingBack" plugin:
       if string.lower(self.IRC.nickname) in string.lower(msg):
         self.IRC.me(channel, "snuggles %s" % user.split("!",1)[0])
       return
-  
